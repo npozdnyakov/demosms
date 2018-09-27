@@ -1,0 +1,128 @@
+<html><head>
+<script src="https://widget.cloudpayments.ru/bundles/cloudpayments"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="shortcut icon" type=image/png href=https://www.dropbox.com/s/b11tk5sgsnhfoj1/SMS_Key.png><meta charset=UTF-8><meta name=viewport content="width=1280px, maximum-scale=1.0"></head>
+
+<center>
+<h1>The weather is:</h1>
+
+<p id="temp">температура в кельвинах: --- </p>
+<p>_______</p>
+<p id="sign">НАЖАТЬ для получения инфы минус/плюс</p>
+<h2 id="runme">CLICK me please!</h2>Celsium
+<p>_______</p>
+<h2 id="cond"></h2>
+
+<form id="form" onsubmit="return false;">
+    <input style="width:100px;" type="number" id="userInput" />
+    <input value="Оплатить CloudPayments" style="width:150px;" type="submit" onclick="pay()" />
+</form>
+
+<script>
+    
+$('#userInput').change(function() {
+    $('#mysum').val($(this).val());
+});    
+</script>
+
+<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml"> 
+    <input type="hidden" name="receiver" value="41001848558561"> 
+    <input style="width: 400px;" type="text" name="formcomment" value="Проект «Железный человек»: реактор холодного ядерного синтеза" disabled> 
+    <input type="hidden" name="short-dest" value="Проект «Железный человек»: реактор холодного ядерного синтеза"> 
+    <input type="hidden" name="label" value="$order_id"> 
+    <input type="hidden" name="quickpay-form" value="donate"> 
+    <input type="hidden" name="targets" value="транзакция {order_id}"> 
+    <input id="mysum" type="hidden" name="sum" value="4568.25" data-type="number"> 
+    <input type="hidden" name="comment" value="Хотелось бы дистанционного управления."> 
+    <label><input type="radio" name="paymentType" value="PC">Яндекс.Деньгами</label> 
+    <label><input type="radio" name="paymentType" value="AC">Банковской картой</label> 
+    <input type="submit" value="Перевести Яндекс.Кнопкой"> 
+</form>
+
+<script>
+
+this.pay = function () {
+    var widget = new cp.CloudPayments();
+    var summ = parseInt(document.getElementById("userInput").value);
+    widget.charge({ // options
+            publicId: 'test_api_00000000000000000000001',  //id из личного кабинета
+            description: 'Пример оплаты (деньги сниматься не будут)', //назначение
+            amount: summ, //сумма
+            currency: 'RUB', //валюта
+            invoiceId: '1234567', //номер заказа  (необязательно)
+            accountId: 'user@example.com', //идентификатор плательщика (необязательно)
+            data: {
+                myProp: 'myProp value' //произвольный набор параметров
+            }
+        },
+        function (options) { // success
+            //действие при успешной оплате
+        },
+        function (reason, options) { // fail
+            //действие при неуспешной оплате
+        });
+};    
+
+</script>
+
+<script type="text/javascript">
+
+document.getElementById("runme").onclick = function() {Weather()};
+document.getElementById("sign").onclick = function() {PLusMinus()};
+
+function Weather(){
+
+var xmlhttp = new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var myObj = JSON.parse(this.responseText);
+        document.getElementById("runme").innerHTML = myObj.list[2].main.temp;
+        document.getElementById("cond").innerHTML = myObj.list[2].weather[0].description;
+
+    }
+};
+
+
+var requestURL = 'http://api.openweathermap.org/data/2.5/forecast?id=5601538&units=metric&APPID=92725011178eede9159f7f8defaf6427';
+xmlhttp.open("GET", requestURL);
+xmlhttp.send();
+
+}
+
+function PLusMinus(){
+
+var xmlhttp2 = new XMLHttpRequest();
+xmlhttp2.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var myObj2 = JSON.parse(this.responseText);
+        var pm;
+        if (myObj2.list[2].main.temp < 273){
+        document.getElementById("sign").innerHTML = "plus";	
+        document.getElementById("temp").innerHTML = myObj2.list[2].main.temp;
+        } else {
+       document.getElementById("sign").innerHTML = "minus";
+       document.getElementById("temp").innerHTML = myObj2.list[2].main.temp;
+        }
+    }
+
+};
+
+
+var requestURL2 = 'http://api.openweathermap.org/data/2.5/forecast?id=5601538&APPID=92725011178eede9159f7f8defaf6427';
+xmlhttp2.open("GET", requestURL2);
+xmlhttp2.send();
+
+
+
+}
+
+
+
+</script>
+</center>
+
+
+</body>
+</html>
+
+
